@@ -2,7 +2,7 @@ const express = require('express');
 const dotenv = require('dotenv')
 const morgan = require('morgan');
 const passport = require('passport');
-const session = require('express-session');
+const session = require('cookie-session');
 const connectDB = require('./config/db')
 const formidable = require('express-formidable');
 const cookieParser = require('cookie-parser');
@@ -25,10 +25,17 @@ const app = express();
 app.use(cookieParser())
 
 // Setup session middleware
+
+app.set('trust proxy', 1);
+
 app.use(session({
+    cookie:{
+        secure: true,
+        maxAge:60000
+    },
     secret: process.env.JWT_SECRET,
     resave: false,
-    saveUninitialized: false
+    saveUninitialized: true,
 }));
 
 // Body parser
