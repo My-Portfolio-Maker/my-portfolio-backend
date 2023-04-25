@@ -1,7 +1,6 @@
 const express = require('express');
 const dotenv = require('dotenv')
 const morgan = require('morgan');
-const passport = require('passport');
 const session = require('express-session');
 const MemoryStore = require('memorystore')(session)
 const connectDB = require('./config/db')
