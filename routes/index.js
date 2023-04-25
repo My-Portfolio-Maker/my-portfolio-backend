@@ -27,7 +27,7 @@ router.get("/api", auth, (req, res) => {
 router.get('/success', auth, async (req, res) => {
 
     const loggedInUser = await Users.findOne({ _id: req.user.id });
-
+    console.log(req)
     return res.status(200).send(`Welcome ${loggedInUser.name}, you are authenticated`)
 })
 

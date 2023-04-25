@@ -2,10 +2,10 @@ const express = require('express');
 const dotenv = require('dotenv')
 const morgan = require('morgan');
 const passport = require('passport');
-const session = require('cookie-session');
+const session = require('express-session');
 const connectDB = require('./config/db')
 const formidable = require('express-formidable');
-const cookieParser = require('cookie-parser');
+const cors = require('cors')
 
 // Load config 
 
@@ -16,23 +16,17 @@ dotenv.config({
 // Connect to DB
 connectDB(process.env.MONGODB_URI, false)
 
-//Passport Config 
-
-// require('./config/passport')(passport)
-
 const app = express();
 
-app.use(cookieParser())
+// Setup CORS Origin
+
+app.use(cors({ credentials: true, origin: true }))
 
 // Setup session middleware
 
 app.set('trust proxy', 1);
 
 app.use(session({
-    cookie:{
-        secure: true,
-        maxAge:60000
-    },
     secret: process.env.JWT_SECRET,
     resave: false,
     saveUninitialized: true,
