@@ -3,6 +3,7 @@ const dotenv = require('dotenv')
 const morgan = require('morgan');
 const passport = require('passport');
 const session = require('express-session');
+const MemoryStore = require('memorystore')(session)
 const connectDB = require('./config/db')
 const formidable = require('express-formidable');
 const cors = require('cors')
@@ -27,6 +28,10 @@ app.use(cors({ credentials: true, origin: true }))
 app.set('trust proxy', 1);
 
 app.use(session({
+    cookie: { maxAge: 86400000 },
+    store: new MemoryStore({
+      checkPeriod: 86400000 // prune expired entries every 24h
+    }),
     secret: process.env.JWT_SECRET,
     resave: false,
     saveUninitialized: true,
