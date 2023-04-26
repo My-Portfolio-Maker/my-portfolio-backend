@@ -14,6 +14,9 @@ steps:
   inputs:
     versionSpec: '16.x'
   displayName: 'Install Node.js'
+  env:
+    MONGODB_URI: $(MONGODB_URI)
+    JWT_SECRET: $(JWT_SECRET)
 
 - script: |
     npm install
