@@ -6,6 +6,7 @@ const MemoryStore = require('memorystore')(session)
 const connectDB = require('./config/db')
 const formidable = require('express-formidable');
 const cors = require('cors')
+const moment = require('moment')
 
 // Load config 
 
@@ -67,5 +68,5 @@ app.use("/api", require('./routes/api'));
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
     console.log(`Server running in ${process.env.NODE_ENV} mode on port ${PORT}`);
-    console.log(`\nCurrent time: ${new Date(Date.now()).toLocaleTimeString()}\n`)
+    console.log(`\nCurrent time: ${moment().format('LTS')}\n`)
 })
