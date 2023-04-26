@@ -12,13 +12,16 @@ pool:
 steps:
 - task: NodeTool@0
   inputs:
+    versionSource: 'spec'
     versionSpec: '16.x'
+    checkLatest: true
   displayName: 'Install Node.js'
+- task: Npm@1
+  inputs:
+    command: 'ci'
   env:
     MONGODB_URI: $(MONGODB_URI)
     JWT_SECRET: $(JWT_SECRET)
-
 - script: |
-    npm ci
     npm run prod
   displayName: 'npm install and build'
