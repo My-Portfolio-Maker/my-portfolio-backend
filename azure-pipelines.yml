@@ -19,6 +19,6 @@ steps:
     JWT_SECRET: $(JWT_SECRET)
 
 - script: |
-    npm install
+    npm ci
     npm run prod
   displayName: 'npm install and build'
