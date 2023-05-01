@@ -10,19 +10,19 @@ const verifyToken = async (req, res, next) => {
 
     try {
         const { id, sessionId } = jwt.decode(token)
-        await Sessions.findOne({$and: [{userID: id},{sessionID: sessionId}]}).then(async session => {
+        await Sessions.findOne({ $and: [{ userID: id }, { sessionID: sessionId }] }).then(async session => {
             if (session.logoutSession) {
                 const sessionDestroy = await Sessions.deleteOne({ _id: session._id })
-                if(sessionDestroy.acknowledged){
-                    await Users.findOneAndUpdate({_id: id}, {
-                        $pull: {session: session._id}
-                    },{new: true});
+                if (sessionDestroy.acknowledged) {
+                    await Users.findOneAndUpdate({ _id: id }, {
+                        $pull: { session: session._id }
+                    }, { new: true });
                 }
-                return res.status(403).send("Access denied. Invalid token.")
+                return res.status(401).send("Access denied. Invalid token.")
             }
             try {
                 jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
-                    if (err) return res.status(403).send("Access denied. Invalid token.");
+                    if (err) return res.status(401).send("Access denied. Invalid token.");
                     req.user = user;
                     console.log("Authenticated")
                     return next();
@@ -39,4 +39,4 @@ const verifyToken = async (req, res, next) => {
     }
 }
 
-module.exports = verifyToken
+module.exports = { verifyToken }

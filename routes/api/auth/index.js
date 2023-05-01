@@ -1,15 +1,15 @@
 const express = require('express');
-const Users = require('../models/Users');
+const Users = require('../../../models/Users');
 const router = express.Router()
 const jwt = require('jsonwebtoken')
 const bcrypt = require('bcryptjs');
-const auth = require('../middleware/auth')
-const ErrorHandler = require('../errors/ErrorHandler');
-const Sessions = require('../models/Sessions');
-const JWT_CONFIG = require('../config/jwt');
+const auth = require('../../../middleware/auth')
+const ErrorHandler = require('../../../errors/ErrorHandler');
+const Sessions = require('../../../models/Sessions');
+const JWT_CONFIG = require('../../../config/jwt');
 
 // @desc    Server API Register Page
-// @route   GET /api/register
+// @route   GET /api/auth/register
 
 router.post("/register", async (req, res) => {
 
@@ -66,7 +66,7 @@ router.post("/register", async (req, res) => {
 })
 
 // @desc    Server API Login Page
-// @route   GET /api/login
+// @route   GET /api/auth/login
 
 router.post("/login", async (req, res) => {
     try {
@@ -86,9 +86,9 @@ router.post("/login", async (req, res) => {
 
             await Sessions.findOneAndUpdate({ $and: [{ sessionID: req.sessionID }, { userID: id }] }, {
                 expires: exp,
-                logoutSession: false
+                logoutSession: false,
             }, { upsert: true, new: true }).then(session => {
-                return Users.findOneAndUpdate({ _id: id }, { "$push": { session: session._id } }, { new: true })
+                return Users.findOneAndUpdate({ _id: id }, { $addToSet: { session: session._id } }, { new: true })
             }).then(user => {
                 user.populate({
                     path: 'session',
@@ -104,7 +104,7 @@ router.post("/login", async (req, res) => {
             })
             return;
         }
-        return res.status(404).json({
+        return res.status(401).json({
             message: "Invalid Credentials"
         })
     }
@@ -119,9 +119,9 @@ router.post("/login", async (req, res) => {
 })
 
 // @desc    Server API Reauthorize Token
-// @route   GET /api/refresh_auth
+// @route   GET /api/auth/refresh_auth
 
-router.post("/refresh_auth", auth, async (req, res) => {
+router.post("/refresh_auth", auth.verifyToken, async (req, res) => {
     try {
         console.log(req);
     }
@@ -132,9 +132,9 @@ router.post("/refresh_auth", auth, async (req, res) => {
 })
 
 // @desc    Server API Logout
-// @route   GET /api/logout
+// @route   GET /api/auth/logout
 
-router.put("/logout", auth, async (req, res) => {
+router.put("/logout", auth.verifyToken, async (req, res) => {
     try {
         const bearerToken = req.headers.authorization.split(" ")[1];
 

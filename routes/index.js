@@ -15,7 +15,7 @@ router.get("/", (req, res) => {
 // @desc    Server API Page
 // @route   GET /api
 
-router.get("/api", auth, (req, res) => {
+router.get("/api", auth.verifyToken, (req, res) => {
 
     res.send(`Welcome to the server, you are at the Server API Page`);
 
@@ -24,11 +24,15 @@ router.get("/api", auth, (req, res) => {
 // @desc Welcome Page with authentication
 // @route GET /welcome
 
-router.get('/success', auth, async (req, res) => {
+router.get('/success', auth.verifyToken, async (req, res) => {
 
     const loggedInUser = await Users.findOne({ _id: req.user.id });
-    console.log(req)
-    return res.status(200).send(`Welcome ${loggedInUser.name}, you are authenticated`)
+    if(loggedInUser)
+    // console.log(req)
+        return res.status(200).send(`Welcome ${loggedInUser.name}, you are authenticated`)
+    return res.status(404).json({
+        message: "User doesn't exists"
+    })
 })
 
 module.exports = router;
