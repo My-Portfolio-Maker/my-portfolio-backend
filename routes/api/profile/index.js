@@ -4,6 +4,7 @@ const auth = require('../../../middleware/auth');
 const Users = require('../../../models/Users');
 const ErrorHandler = require('../../../errors/ErrorHandler');
 const Profiles = require('../../../models/Profiles');
+const { getAuthTokenFromHeader } = require('../../../utils');
 
 
 // @desc    User Profile
@@ -23,7 +24,7 @@ router.get('/user-profile', auth.verifyToken, async (req, res) => {
                             email,
                             phone,
                             image,
-                            ...profile.toObject()
+                            ...profile.toObject(),
                         }
                     })
                 })
@@ -41,6 +42,54 @@ router.get('/user-profile', auth.verifyToken, async (req, res) => {
         })
     }
 
+})
+
+
+// @desc    Set User Profile by Token
+// @route   PUT /api/profile/user-profile
+
+router.put('/user-profile', auth.verifyToken, async (req, res) => {
+
+    const { id } = req.user
+
+    try {
+        const user = await Users.findById(id);
+        if (user) {
+            const { name, email, phone, image, ...profileInfo } = req.fields;
+            if (name) user.name = name;
+            if (email) user.email = email;
+            if (phone) user.phone = phone;
+            if (image) user.image = image;
+            const userInfo = await user.save();
+
+            await Profiles.findOneAndUpdate({ userId: id }, profileInfo, { new: true }).then(profile => {
+                const { name, email, phone, image } = userInfo.toObject();
+                return res.status(200).json({
+                    message: `Profile Updated for ${name}`,
+                    profile: {
+                        name,
+                        email,
+                        phone,
+                        image,
+                        ...profile.toObject(),
+                    }
+                })
+            })
+            return;
+        }
+        else {
+            return res.status(404).json({
+                message: "User doesn't exists"
+            })
+        }
+
+    }
+    catch (err) {
+        const message = ErrorHandler(err);
+        return res.status(401).json({
+            message
+        })
+    }
 })
 
 module.exports = router;

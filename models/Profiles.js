@@ -27,6 +27,14 @@ const ProfileSchema = new mongoose.Schema({
         type: Number,
         default: null
     },
+    aboutMe: {
+        type: String,
+        default: ''
+    },
+    designation: {
+        type: String,
+        default: ''
+    },
     social: {
         facebook: {
             type: String,
@@ -46,10 +54,9 @@ const ProfileSchema = new mongoose.Schema({
         }
     },
 
-    createdAt: {
-        type: Date,
-        default: Date.now
-    },
+},{
+    versionKey: false,
+    timestamps: true,
 })
 
 module.exports = mongoose.model('Profiles', ProfileSchema);

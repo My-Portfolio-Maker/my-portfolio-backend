@@ -6,7 +6,8 @@ const bcrypt = require('bcryptjs');
 const ErrorHandler = require('../../errors/ErrorHandler');
 
 router.use("/auth", require('./auth'));
-router.use("/profile", require('./profile'));
+router.use("/profile", auth.verifyToken, require('./profile'));
+router.use("/skills", auth.verifyToken, require('./skills'))
 
 // @desc    Change Password Route
 // @router  PATCH /api/change-password

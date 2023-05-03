@@ -27,17 +27,17 @@ const UserSchema = new mongoose.Schema({
         type: String,
         default: ''
     },
-    createdAt: {
-        type: Date,
-        default: Date.now
-    },
     session: [{
         type: Schema.Types.ObjectId,
         ref: "Sessions",
         required: true,
         default: [],
         index: {unique: true, dropDups: true}
-    }]
+    }],
+    
+},{
+    versionKey: false,
+    timestamps: true,
 })
 
 module.exports = mongoose.model('Users', UserSchema)
