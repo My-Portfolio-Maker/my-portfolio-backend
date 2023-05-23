@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const SocialConstants = require('../constants/Socials');
 const Schema = mongoose.Schema;
 
 
@@ -35,24 +36,12 @@ const ProfileSchema = new mongoose.Schema({
         type: String,
         default: ''
     },
-    social: {
-        facebook: {
-            type: String,
-            default: ''
-        },
-        twitter: {
-            type: String,
-            default: ''
-        },
-        linkedin: {
-            type: String,
-            default: ''
-        },
-        github: {
-            type: String,
-            default: ''
-        }
-    },
+    social: SocialConstants,
+    
+    project_completed: {
+        type: String,
+        default: ''
+    }
 
 },{
     versionKey: false,

@@ -5,6 +5,9 @@ const Users = require('../../../models/Users');
 const ErrorHandler = require('../../../errors/ErrorHandler');
 const Profiles = require('../../../models/Profiles');
 const { getAuthTokenFromHeader } = require('../../../utils');
+const SocialConstants = require('../../../constants/Socials');
+
+router.use('/extras', auth.verifyToken, require('./Extras'));
 
 
 // @desc    User Profile
@@ -62,7 +65,17 @@ router.put('/user-profile', auth.verifyToken, async (req, res) => {
             if (image) user.image = image;
             const userInfo = await user.save();
 
-            await Profiles.findOneAndUpdate({ userId: id }, profileInfo, { new: true }).then(profile => {
+            let social = {};
+            Object.keys(SocialConstants).map(items => {
+                social = {
+                    ...social,
+                    [items]: profileInfo[items]
+                }
+                delete profileInfo[items]
+            })
+            profileInfo['social'] = social
+
+            await Profiles.findOneAndUpdate({ userId: id }, profileInfo, { new: true, upsert: true }).then(profile => {
                 const { name, email, phone, image } = userInfo.toObject();
                 return res.status(200).json({
                     message: `Profile Updated for ${name}`,

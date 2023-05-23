@@ -32,10 +32,9 @@ const UserSchema = new mongoose.Schema({
         ref: "Sessions",
         required: true,
         default: [],
-        index: {unique: true, dropDups: true}
     }],
-    
-},{
+
+}, {
     versionKey: false,
     timestamps: true,
 })

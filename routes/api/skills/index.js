@@ -97,11 +97,14 @@ router.put("/update", auth.verifyToken, async (req, res)=>{
     const {scoreId} = req.query;
     const {score} = req.fields;
 
+    
+
     if(!score) return res.status(404).json({message: 'Please provide new score in percentage'})
     try {
         const user = await Users.findById(req.user.id);
         if(user){
-            await Skills.findByIdAndUpdate(scoreId, {score}, {new: true}).then(skill=>{
+            const {_id} = await SkillsMaster.findOne({userId: user.id})
+            await Skills.findOneAndUpdate({$and: [{ _id: scoreId }, {skillMasterId: _id} ]}, {score}, {new: true}).then(skill=>{
                 skill.populate({
                     path: 'skill',
                     model: 'SkillData',
@@ -112,6 +115,10 @@ router.put("/update", auth.verifyToken, async (req, res)=>{
                         message: `Updated Skill Score for ${info.skill.name}`,
                         data: skillInfo
                     })
+                })
+            }).catch(_=>{
+                return res.status(403).json({
+                    message: 'Error updating skill'
                 })
             })
         }

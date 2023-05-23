@@ -43,16 +43,9 @@ router.post("/register", async (req, res) => {
             return userInfo
         })
 
-        const token = jwt.sign(
-            { id: registeredUser._id, email, name },
-            process.env.JWT_SECRET, {
-            expiresIn: JWT_CONFIG.JWT_EXPIRE
-        })
-
         return res.status(201).json({
             message: "User created successfully",
             user: registeredUser,
-            token: token
         })
     }
     catch (err) {
@@ -134,7 +127,7 @@ router.post("/refresh_auth", auth.verifyToken, async (req, res) => {
 // @desc    Server API Logout
 // @route   GET /api/auth/logout
 
-router.put("/logout", auth.verifyToken, async (req, res) => {
+router.delete("/logout", auth.verifyToken, async (req, res) => {
     try {
         const bearerToken = req.headers.authorization.split(" ")[1];
 
