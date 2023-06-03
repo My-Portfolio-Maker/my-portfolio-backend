@@ -3,7 +3,7 @@ const Schema = mongoose.Schema
 
 const SkillsSchema = new mongoose.Schema({
     skillMasterId: {
-        type: String,
+        type: Schema.Types.ObjectId,
         required: true,
     },
     skillId: {

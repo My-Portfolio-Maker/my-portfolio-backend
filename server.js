@@ -63,7 +63,6 @@ app.use((_req, res, next) => {
 //routes
 
 app.use("/", require('./routes/index'));
-app.use("/api", require('./routes/api'));
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {

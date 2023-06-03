@@ -1,10 +1,10 @@
 const express = require('express');
 const router = express.Router();
-const auth = require('../../../../middleware/auth');
-const Users = require('../../../../models/Users');
-const Extrasmaster = require('../../../../models/Extrasmaster');
-const ErrorHandler = require('../../../../errors/ErrorHandler');
-const Extras = require('../../../../models/Extras');
+const auth = require('../../../../../middleware/auth');
+const Users = require('../../../../../models/Users');
+const Extrasmaster = require('../../../../../models/Extrasmaster');
+const ErrorHandler = require('../../../../../errors/ErrorHandler');
+const Extras = require('../../../../../models/Extras');
 
 const getExtras = async (_id, name, res, cb) => {
     await Extrasmaster.findOneAndUpdate({ userId: _id }, {}, { upsert: true, new: true }).then(async extraMaster => {
@@ -106,25 +106,23 @@ router.put('/', auth.verifyToken, async (req, res) => {
 router.delete('/delete', auth.verifyToken, async (req, res) => {
 
     const { extraId } = req.query;
-    if(!extraId) return res.status(404).json({
+    if (!extraId) return res.status(404).json({
         message: 'Please enter valid id'
     })
     const { id } = req.user;
     try {
         const { _id, name } = await Users.findById(id);
         if (_id) {
-            const extraMaster = await Extrasmaster.findOne({userId: id})
+            const extraMaster = await Extrasmaster.findOne({ userId: id })
             if (extraMaster) {
-                await Extras.findOneAndDelete({$and: [{extraMasterId: extraMaster._id},{_id: extraId}]}).then(deleted=>{
-                    Extrasmaster.findOneAndUpdate({ _id: extraMaster._id }, { $pull: { extras: deleted._id } }, { new: true })
-
+                await Extras.findOneAndDelete({ $and: [{ extraMasterId: extraMaster._id }, { _id: extraId }] }).then(async deleted => {
+                    await Extrasmaster.findOneAndUpdate({ _id: extraMaster._id }, { $pull: { extras: deleted._id } }, { new: true })
                     return res.status(200).json({
                         message: `Deleted ${deleted.name} for ${name}`,
                         data: deleted
                     })
                 })
             }
-
         }
     }
     catch (err) {

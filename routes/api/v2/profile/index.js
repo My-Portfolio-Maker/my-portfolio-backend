@@ -1,11 +1,11 @@
 const express = require('express');
 const router = express.Router();
-const auth = require('../../../middleware/auth');
-const Users = require('../../../models/Users');
-const ErrorHandler = require('../../../errors/ErrorHandler');
-const Profiles = require('../../../models/Profiles');
-const { getAuthTokenFromHeader } = require('../../../utils');
-const SocialConstants = require('../../../constants/Socials');
+const auth = require('../../../../middleware/auth');
+const Users = require('../../../../models/Users');
+const ErrorHandler = require('../../../../errors/ErrorHandler');
+const Profiles = require('../../../../models/Profiles');
+const { getAuthTokenFromHeader } = require('../../../../utils');
+const SocialConstants = require('../../../../constants/Socials');
 
 router.use('/extras', auth.verifyToken, require('./Extras'));
 

@@ -1,12 +1,12 @@
 const express = require('express');
-const Users = require('../../../models/Users');
+const Users = require('../../../../models/Users');
 const router = express.Router()
 const jwt = require('jsonwebtoken')
 const bcrypt = require('bcryptjs');
-const auth = require('../../../middleware/auth')
-const ErrorHandler = require('../../../errors/ErrorHandler');
-const Sessions = require('../../../models/Sessions');
-const JWT_CONFIG = require('../../../config/jwt');
+const auth = require('../../../../middleware/auth')
+const ErrorHandler = require('../../../../errors/ErrorHandler');
+const Sessions = require('../../../../models/Sessions');
+const JWT_CONFIG = require('../../../../config/jwt');
 
 // @desc    Server API Register Page
 // @route   GET /api/auth/register
