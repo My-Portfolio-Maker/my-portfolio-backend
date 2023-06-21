@@ -1,8 +1,7 @@
 const express = require('express');
 const ErrorHandler = require('../../../../../errors/ErrorHandler');
-const Profiles = require('../../../../../models/Profiles');
 const Users = require('../../../../../models/Users');
-const Extrasmaster = require('../../../../../models/Extrasmaster');
+const Extras_Master = require('../../../../../models/Extras_Master');
 const router = express.Router()
 
 router.get('/', async (req, res) => {
@@ -13,7 +12,7 @@ router.get('/', async (req, res) => {
         await Users.findById(uid).then(user => {
             if (user) {
                 const { name } = user;
-                Extrasmaster.findOne({ userId: uid }).then(async extraMaster => {
+                Extras_Master.findOne({ userId: uid }).then(async extraMaster => {
                     try {
                         await extraMaster.populate({
                             path: 'extras',
