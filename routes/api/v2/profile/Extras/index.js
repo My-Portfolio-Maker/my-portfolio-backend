@@ -4,10 +4,10 @@ const auth = require('../../../../../middleware/auth');
 const Users = require('../../../../../models/Users');
 const ErrorHandler = require('../../../../../errors/ErrorHandler');
 const Extras = require('../../../../../models/Extras');
-const Extrasmaster = require('../../../../../models/Extrasmaster');
+const Extras_Master = require('../../../../../models/Extras_Master');
 
 const getExtras = async (_id, name, res, cb) => {
-    await Extrasmaster.findOneAndUpdate({ userId: _id }, {}, { upsert: true, new: true }).then(async extraMaster => {
+    await Extras_Master.findOneAndUpdate({ userId: _id }, {}, { upsert: true, new: true }).then(async extraMaster => {
         try {
             await extraMaster.populate({
                 path: 'extras',
@@ -62,7 +62,7 @@ router.put('/', auth.verifyToken, async (req, res) => {
     try {
         const { _id, name } = await Users.findById(id);
         if (_id) {
-            await Extrasmaster.findOneAndUpdate({ userId: _id }, {}, { upsert: true, new: true }).then(async extraMaster => {
+            await Extras_Master.findOneAndUpdate({ userId: _id }, {}, { upsert: true, new: true }).then(async extraMaster => {
                 const extraObject = req.body;
                 Object.keys(extraObject).map(async extraKey => {
                     const { _id, name } = extraObject[extraKey]
@@ -76,7 +76,7 @@ router.put('/', auth.verifyToken, async (req, res) => {
 
                     },
                         { ...extraObject[extraKey] }, { upsert: true, new: true }).then(extra => {
-                            return Extrasmaster.findOneAndUpdate({ _id: extraMaster._id }, { $addToSet: { extras: extra._id } }, { new: true })
+                            return Extras_Master.findOneAndUpdate({ _id: extraMaster._id }, { $addToSet: { extras: extra._id } }, { new: true })
                         })
 
                 })
@@ -113,10 +113,10 @@ router.delete('/delete', auth.verifyToken, async (req, res) => {
     try {
         const { _id, name } = await Users.findById(id);
         if (_id) {
-            const extraMaster = await Extrasmaster.findOne({ userId: id })
+            const extraMaster = await Extras_Master.findOne({ userId: id })
             if (extraMaster) {
                 await Extras.findOneAndDelete({ $and: [{ extraMasterId: extraMaster._id }, { _id: extraId }] }).then(async deleted => {
-                    await Extrasmaster.findOneAndUpdate({ _id: extraMaster._id }, { $pull: { extras: deleted._id } }, { new: true })
+                    await Extras_Master.findOneAndUpdate({ _id: extraMaster._id }, { $pull: { extras: deleted._id } }, { new: true })
                     return res.status(200).json({
                         message: `Deleted ${deleted.name} for ${name}`,
                         data: deleted
