@@ -1,6 +1,6 @@
 const { default: mongoose, Schema } = require("mongoose");
 
-const ExtrasMasterSchema = new mongoose.Schema({
+const ExtrasmasterSchema = new mongoose.Schema({
     userId: {
         type: Schema.Types.ObjectId,
         ref: 'Users',
@@ -19,4 +19,4 @@ const ExtrasMasterSchema = new mongoose.Schema({
     }
 )
 
-module.exports = mongoose.model('ExtrasMaster', ExtrasMasterSchema, 'extras_master')
+module.exports = mongoose.model('ExtrasMaster', ExtrasmasterSchema, 'extras_master')
