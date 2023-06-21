@@ -6,7 +6,12 @@ const MemoryStore = require('memorystore')(session)
 const connectDB = require('./config/db')
 const formidable = require('express-formidable');
 const cors = require('cors')
-const moment = require('moment')
+const moment = require('moment');
+const path = require('path')
+
+module.exports = {
+    __basedir: __dirname
+}
 
 // Load config 
 
@@ -30,15 +35,15 @@ app.set('trust proxy', 1);
 app.use(session({
     cookie: { maxAge: 86400000 },
     store: new MemoryStore({
-      checkPeriod: 86400000 // prune expired entries every 24h
+        checkPeriod: 86400000 // prune expired entries every 24h
     }),
     secret: process.env.JWT_SECRET,
     resave: false,
     saveUninitialized: true,
 }));
 
-// Body parser
-app.use(formidable())
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 //middleware for logging http requests
 
@@ -63,7 +68,6 @@ app.use((_req, res, next) => {
 //routes
 
 app.use("/", require('./routes/index'));
-app.use("/api", require('./routes/api'));
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {

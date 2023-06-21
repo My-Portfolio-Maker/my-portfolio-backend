@@ -23,21 +23,20 @@ const UserSchema = new mongoose.Schema({
         type: String,
         minlength: [6, 'Password must be at least 6 characters']
     },
-    image: {
-        type: String,
-        default: ''
-    },
-    createdAt: {
-        type: Date,
-        default: Date.now
+    avatar: {
+        type: Schema.Types.ObjectId,
+        ref: 'Uploads'
     },
     session: [{
         type: Schema.Types.ObjectId,
         ref: "Sessions",
         required: true,
         default: [],
-        index: {unique: true, dropDups: true}
-    }]
+    }],
+
+}, {
+    versionKey: false,
+    timestamps: true,
 })
 
 module.exports = mongoose.model('Users', UserSchema)
