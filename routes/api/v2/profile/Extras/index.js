@@ -2,9 +2,9 @@ const express = require('express');
 const router = express.Router();
 const auth = require('../../../../../middleware/auth');
 const Users = require('../../../../../models/Users');
-const Extrasmaster = require('../../../../../models/Extrasmaster');
 const ErrorHandler = require('../../../../../errors/ErrorHandler');
 const Extras = require('../../../../../models/Extras');
+const Extrasmaster = require('../../../../../models/Extrasmaster');
 
 const getExtras = async (_id, name, res, cb) => {
     await Extrasmaster.findOneAndUpdate({ userId: _id }, {}, { upsert: true, new: true }).then(async extraMaster => {
