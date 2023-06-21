@@ -20,6 +20,11 @@ const ProfileSchema = new mongoose.Schema({
         trim: true,
         default: null
     },
+    images: [{
+        type: Schema.Types.ObjectId,
+        ref: 'Uploads',
+        default: []
+    }],
     address: {
         type: String,
         default: ''
@@ -37,13 +42,18 @@ const ProfileSchema = new mongoose.Schema({
         default: ''
     },
     social: SocialConstants,
-    
+
     project_completed: {
         type: String,
         default: ''
+    },
+    cv: {
+        type: Schema.Types.ObjectId,
+        ref: 'CV',
+        index: { unique: true }
     }
 
-},{
+}, {
     versionKey: false,
     timestamps: true,
 })

@@ -1,6 +1,8 @@
 const jwt = require("jsonwebtoken");
 const Sessions = require("../models/Sessions");
 const Users = require("../models/Users");
+const Profiles = require("../models/Profiles");
+const ErrorHandler = require("../errors/ErrorHandler");
 
 const verifyToken = async (req, res, next) => {
     const bearerHeader = req.headers["authorization"];
@@ -39,4 +41,26 @@ const verifyToken = async (req, res, next) => {
     }
 }
 
-module.exports = { verifyToken }
+const verifyUID = async (req, res, next) => {
+    const { uid } = req.headers;
+    
+    if (!uid) return res.status(401).send("Access denied. No UID provided.");
+
+    try {
+        await Users.findById(uid).then(user => {
+            if (user)
+                return next();
+            return res.status(404).json({
+                message: "User doesn't exists"
+            })
+        })
+    }
+    catch (err) {
+        const message = ErrorHandler(err);
+        return res.status(401).json({
+            message
+        })
+    }
+}
+
+module.exports = { verifyToken, verifyUID }

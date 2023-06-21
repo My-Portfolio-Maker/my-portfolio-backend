@@ -67,7 +67,7 @@ router.post("/add", auth.verifyToken, async (req, res) => {
         const user = await Users.findById(id);
         if (user) {
             await SkillsMaster.findOneAndUpdate({ userId: id }, {}, { upsert: true, new: true }).then(async skillMaster => {
-                const skillsObject = req.fields
+                const skillsObject = req.body
                 await Promise.all(Object.keys(skillsObject).map(async skillKey => {
                     await SkillData.findOneAndUpdate({ name: skillKey }, {}, { upsert: true, new: true }).then(async skill => {
                         await Skills.findOneAndUpdate({ $and: [{ skillMasterId: skillMaster._id }, { skillId: skill._id }] }, { score: skillsObject[skillKey] }, { upsert: true, new: true }).then(skill => {
@@ -103,7 +103,7 @@ router.post("/add", auth.verifyToken, async (req, res) => {
 
 router.put("/update", auth.verifyToken, async (req, res) => {
     const { scoreId } = req.query;
-    const { score } = req.fields;
+    const { score } = req.body;
 
 
 

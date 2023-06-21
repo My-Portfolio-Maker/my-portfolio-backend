@@ -2,9 +2,14 @@ const express = require('express');
 const router = express.Router()
 const auth = require('../../middleware/auth');
 const Users = require('../../models/Users');
+const formData = require('../../middleware/formData');
+const uploadFile = require('../../middleware/upload');
 
-router.use('/v2', require('./v2'))
 
+router.use('/v3', auth.verifyToken, require('./v3')); // Only for Upload APIs
+
+router.use('/v2', formData, require('./v2'))
+router.use('/v1', require('./v1'))
 // @desc    Welcome Page with authentication
 // @route   GET /welcome
 

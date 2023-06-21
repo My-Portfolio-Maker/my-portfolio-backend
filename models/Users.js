@@ -23,9 +23,9 @@ const UserSchema = new mongoose.Schema({
         type: String,
         minlength: [6, 'Password must be at least 6 characters']
     },
-    image: {
-        type: String,
-        default: ''
+    avatar: {
+        type: Schema.Types.ObjectId,
+        ref: 'Uploads'
     },
     session: [{
         type: Schema.Types.ObjectId,

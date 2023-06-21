@@ -63,7 +63,7 @@ router.put('/', auth.verifyToken, async (req, res) => {
         const { _id, name } = await Users.findById(id);
         if (_id) {
             await Extrasmaster.findOneAndUpdate({ userId: _id }, {}, { upsert: true, new: true }).then(async extraMaster => {
-                const extraObject = req.fields;
+                const extraObject = req.body;
                 Object.keys(extraObject).map(async extraKey => {
                     const { _id, name } = extraObject[extraKey]
                     await Extras.findOneAndUpdate({

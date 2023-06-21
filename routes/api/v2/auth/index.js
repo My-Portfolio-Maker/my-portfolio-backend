@@ -15,9 +15,9 @@ router.post("/register", async (req, res) => {
 
     try {
 
-        console.log(req.fields)
+        console.log(req.body)
 
-        const { name, email, phone, image, password } = req.fields;
+        const { name, email, phone, avatar, password } = req.body;
 
         if (!email) res.status(400).send({ error: "Email is required" })
         if (!password) res.status(400).send({ error: "Password is required" })
@@ -36,7 +36,7 @@ router.post("/register", async (req, res) => {
             name,
             email: email.toLowerCase(),
             phone,
-            image,
+            avatar,
             password: hashedPassword
         }).then(user => {
             const { password, ...userInfo } = user.toObject()
@@ -63,7 +63,8 @@ router.post("/register", async (req, res) => {
 
 router.post("/login", async (req, res) => {
     try {
-        const { email, password } = req.fields
+
+        const { email, password } = req.body
         if (!email) return res.status(400).json({ error: "Email is required" })
         if (!password) return res.status(400).json({ error: "Password is required" })
 

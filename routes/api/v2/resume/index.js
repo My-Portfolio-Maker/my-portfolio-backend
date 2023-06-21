@@ -19,7 +19,7 @@ router.post('/add', auth.verifyToken, async (req, res) => {
         if (user) {
             const { _id, name } = user
 
-            const { start_date, end_date, ...rest } = req.fields
+            const { start_date, end_date, ...rest } = req.body
             if (!rest.cwh_flag) return res.status(400).send("Cwh flag is required")
             if (!end_date && rest.cwh_flag == 'false') return res.status(400).send("End date is required");
 
@@ -120,7 +120,7 @@ router.put('/update', auth.verifyToken, async (req, res) => {
         if (_id) {
             await ResumeMaster.findOne({ userId: _id }).then(async resumeMaster => {
                 const { _id } = resumeMaster
-                const { start_date, end_date, ...rest } = req.fields
+                const { start_date, end_date, ...rest } = req.body
 
                 if (!rest.cwh_flag) return res.status(400).send("Cwh flag is required")
                 if (!end_date && rest.cwh_flag === 'false') return res.status(400).send("End date is required");

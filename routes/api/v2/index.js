@@ -6,9 +6,10 @@ const bcrypt = require('bcryptjs');
 const ErrorHandler = require('../../../errors/ErrorHandler');
 
 router.use("/auth", require('./auth'));
-router.use("/profile", auth.verifyToken, require('./profile'));
+router.use("/profile", auth.verifyToken, require('./profile').router);
 router.use("/skills", auth.verifyToken, require('./skills'));
 router.use("/resume", auth.verifyToken, require('./resume'));
+router.use('/services', auth.verifyToken, require('./services'));
 
 // @desc    Server API Page
 // @route   GET /api/v2
@@ -21,7 +22,7 @@ router.get("/", auth.verifyToken, (_, res) => {
 // @router  PATCH /api/v2/change-password
 
 router.patch('/change-password', auth.verifyToken, async (req, res) => {
-    const { old_password, new_password, user_id } = req.fields;
+    const { old_password, new_password, user_id } = req.body;
 
     if (!user_id) return res.status(400).json({ error: "User ID is required" })
     if (!old_password) return res.status(400).json({ error: "Old Password is required" })

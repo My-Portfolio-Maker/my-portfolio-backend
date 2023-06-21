@@ -20,6 +20,19 @@ const resolveDateFormat = (data, format) => {
         else if (!format)
             return moment(data, defaultDateFormat)
     }
-    return moment().format(format?format:defaultDateFormat)
+    return moment().format(format ? format : defaultDateFormat)
 }
-module.exports = { getAuthTokenFromHeader, resolveDateFormat };
+
+
+const getFileExtension = (fileName) => {
+
+    const array = fileName.split(".");
+    if (array.length === 1 || (array[0] == "" && array.length === 2)) {
+        return ""
+    }
+    return array.pop();
+
+}
+
+
+module.exports = { getAuthTokenFromHeader, resolveDateFormat, getFileExtension };

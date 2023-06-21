@@ -1,7 +1,5 @@
 const { userValidation } = require("./Errors")
 
-
-
 const ErrorHandler = (error)=>{
     if(error) {
         const {errors, message} = error
@@ -9,7 +7,6 @@ const ErrorHandler = (error)=>{
             
             case 'Users validation failed': 
                 return userValidation(errors)
-
             default : return message
         }
     }

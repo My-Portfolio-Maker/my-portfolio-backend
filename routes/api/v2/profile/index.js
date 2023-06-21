@@ -6,9 +6,34 @@ const ErrorHandler = require('../../../../errors/ErrorHandler');
 const Profiles = require('../../../../models/Profiles');
 const { getAuthTokenFromHeader } = require('../../../../utils');
 const SocialConstants = require('../../../../constants/Socials');
+const { default: mongoose, mongo } = require('mongoose');
 
 router.use('/extras', auth.verifyToken, require('./Extras'));
 
+const profileHandler = async (res, userInfo, profile, update = false) => {
+    const { name, email, phone, avatar } = userInfo.toObject();
+    await profile.populate({
+        path: 'cv',
+        model: 'CV',
+        select: { name: 1, type: 1, _id: 1 }
+    }).then(profile => {
+        const { _id, userId, social, cv, ...rest } = profile.toObject()
+        return res.status(200).json({
+            message: `Profile ${update ? 'Updated' : 'Details'} for ${name}`,
+            profile: {
+                _id,
+                userId,
+                name,
+                email,
+                phone,
+                avatar,
+                ...rest,
+                social,
+                cv
+            }
+        })
+    })
+}
 
 // @desc    User Profile
 // @route   GET /api/profile/user-profile
@@ -18,19 +43,18 @@ router.get('/user-profile', auth.verifyToken, async (req, res) => {
     try {
         await Users.findById(req.user.id).then(user => {
             if (user) {
-                Profiles.findOneAndUpdate({ userId: user._id }, {}, { upsert: true, new: true }).then(profile => {
-                    const { name, email, phone, image } = user.toObject();
-                    return res.status(200).json({
-                        message: `Profile Details of ${name}`,
-                        profile: {
-                            name,
-                            email,
-                            phone,
-                            image,
-                            ...profile.toObject(),
-                        }
+                user.populate({
+                    path: 'avatar',
+                    model: 'Uploads',
+                    select: { name: 1, type: 1 }
+                }).then(async user => {
+                    await Profiles.findOneAndUpdate({ userId: user._id }, {}, { upsert: true, new: true }).then(async profile => {
+
+                        await profileHandler(res, user, profile)
+
                     })
                 })
+
                 return;
             }
             return res.status(404).json({
@@ -58,11 +82,11 @@ router.put('/user-profile', auth.verifyToken, async (req, res) => {
     try {
         const user = await Users.findById(id);
         if (user) {
-            const { name, email, phone, image, ...profileInfo } = req.fields;
+            const { name, email, phone, avatar, ...profileInfo } = req.body;
             if (name) user.name = name;
             if (email) user.email = email;
             if (phone) user.phone = phone;
-            if (image) user.image = image;
+            if (avatar) user.avatar = avatar;
             const userInfo = await user.save();
 
             let social = {};
@@ -74,18 +98,13 @@ router.put('/user-profile', auth.verifyToken, async (req, res) => {
                 delete profileInfo[items]
             })
             profileInfo['social'] = social
-
-            await Profiles.findOneAndUpdate({ userId: id }, profileInfo, { new: true, upsert: true }).then(profile => {
-                const { name, email, phone, image } = userInfo.toObject();
-                return res.status(200).json({
-                    message: `Profile Updated for ${name}`,
-                    profile: {
-                        name,
-                        email,
-                        phone,
-                        image,
-                        ...profile.toObject(),
-                    }
+            userInfo.populate({
+                path: 'avatar',
+                model: 'Uploads',
+                select: { name: 1, type: 1 }
+            }).then(async user => {
+                await Profiles.findOneAndUpdate({ userId: id }, { ...profileInfo }, { new: true, upsert: true }).then(async profile => {
+                    await profileHandler(res, user, profile, true)
                 })
             })
             return;
@@ -105,4 +124,7 @@ router.put('/user-profile', auth.verifyToken, async (req, res) => {
     }
 })
 
-module.exports = router;
+module.exports = {
+    router,
+    profileHandler
+};
