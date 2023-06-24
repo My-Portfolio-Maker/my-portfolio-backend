@@ -23,15 +23,25 @@ const getSkills = async (id, res, user, cb) => {
             },
             select: { skillId: 1, score: 1 },
         }).then(skills => {
-            const { userId, _id, ...skillInfo } = skills.toObject()
+            const { userId, _id, title, ...skillInfo } = skills.toObject()
             if (cb) return cb(skillInfo)
             else {
                 return res.status(200).json({
                     message: `Skills of ${user.name}`,
-                    ...skillInfo,
+                    data: {
+                        _id,
+                        userId,
+                        title,
+                        ...skillInfo,
+                    }
                 })
             }
 
+        })
+    }).catch(err=>{
+        const message = ErrorHandler(err)
+        return res.status(400).json({
+            message
         })
     })
 }

@@ -1,5 +1,5 @@
 const multer = require('multer');
-const { __basedir } = require('../server');
+const { __basedir } = require('../server.js');
 const { v4: uuidv4 } = require('uuid');
 const { getFileExtension } = require('../utils');
 const util = require('util');
@@ -46,7 +46,7 @@ const uploadFile = (type, keepExtension) => {
             cb(null, __basedir + `/uploads/${type}`)
         },
         filename: (req, file, cb) => {
-            const newFileName = keepExtension?uuidv4()+"."+getFileExtension(file.originalname):uuidv4();
+            const newFileName = keepExtension ? uuidv4() + "." + getFileExtension(file.originalname) : uuidv4();
             //rename the incoming file to the file's name
             cb(null, newFileName);
         },
@@ -57,18 +57,16 @@ const uploadFile = (type, keepExtension) => {
         limits: {
             fileSize: maxSize,
         },
-        fileFilter(req, file, cb) {
-            if(type === 'images'){
+        fileFilter: (req, file, cb) => {
+            if (type === 'images') {
                 if (!file.originalname.match(/\.(jpg|jpeg|png)$/)) {
                     return cb(new Error('Please upload a valid image file'))
                 }
-                cb(undefined, true)
-            }   
-            else if(type === 'cv'){
+            }
+            else if (type === 'cv') {
                 if (!file.originalname.match(/\.(pdf|docx|doc|pptx|txt)$/)) {
                     return cb(new Error('Please upload a valid document file'))
                 }
-                cb(undefined, true)
             }
             cb(undefined, true)
         }

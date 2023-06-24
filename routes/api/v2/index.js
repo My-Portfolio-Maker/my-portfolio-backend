@@ -41,6 +41,11 @@ router.patch('/change-password', auth.verifyToken, async (req, res) => {
                 return res.status(200).json({
                     message: 'Password changed successfully'
                 })
+            }).catch(err=>{
+                const message = ErrorHandler(err)
+                return res.status(400).json({
+                    message
+                })
             })
             return;
         }

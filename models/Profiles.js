@@ -9,7 +9,7 @@ const ProfileSchema = new mongoose.Schema({
         type: Schema.Types.ObjectId,
         ref: 'Users',
         required: true,
-        index: { unique: true, dropDups: true }
+        index: { unique: true }
     },
     gender: {
         type: String,
@@ -50,7 +50,6 @@ const ProfileSchema = new mongoose.Schema({
     cv: {
         type: Schema.Types.ObjectId,
         ref: 'CV',
-        index: { unique: true }
     }
 
 }, {

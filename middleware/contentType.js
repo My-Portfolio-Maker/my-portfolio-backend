@@ -1,5 +1,5 @@
 const path = require('path');
-const { __basedir } = require('../server');
+const { __basedir } = require('../server.js');
 const fs = require('fs')
 
 

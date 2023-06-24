@@ -48,12 +48,20 @@ app.use(express.urlencoded({ extended: true }));
 //middleware for logging http requests
 
 const logger = (req, res, next) => {
-    console.log("Logging ", req.url)
+    console.log("Logging ", req.url);
+    
     next()
 }
 
 if (process.env.NODE_ENV === 'development') {
     app.use(morgan('dev'));
+}
+else if(process.env.NODE_ENV === 'development-no-crash'){
+    app.use(morgan('dev'))
+    process.on('uncaughtException', function(err){
+        console.error(err.stack);
+        process.exit()
+    })
 }
 
 app.use(logger)

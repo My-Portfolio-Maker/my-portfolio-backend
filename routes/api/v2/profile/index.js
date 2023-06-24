@@ -6,18 +6,27 @@ const ErrorHandler = require('../../../../errors/ErrorHandler');
 const Profiles = require('../../../../models/Profiles');
 const { getAuthTokenFromHeader } = require('../../../../utils');
 const SocialConstants = require('../../../../constants/Socials');
-const { default: mongoose, mongo } = require('mongoose');
+const moment = require('moment');
+const { defaultDateFormat } = require('../../../../constants');
+
 
 router.use('/extras', auth.verifyToken, require('./Extras'));
 
 const profileHandler = async (res, userInfo, profile, update = false) => {
     const { name, email, phone, avatar } = userInfo.toObject();
-    await profile.populate({
-        path: 'cv',
-        model: 'CV',
-        select: { name: 1, type: 1, _id: 1 }
-    }).then(profile => {
-        const { _id, userId, social, cv, ...rest } = profile.toObject()
+    await profile.populate([
+        {
+            path: 'cv',
+            model: 'CV',
+            select: { name: 1, type: 1, _id: 1 },
+        },
+        {
+            path: 'images',
+            model: 'Uploads',
+            select: { name: 1, type: 1 }
+        }
+    ]).then(profile => {
+        const { _id, userId, social, cv, updatedAt, ...rest } = profile.toObject()
         return res.status(200).json({
             message: `Profile ${update ? 'Updated' : 'Details'} for ${name}`,
             profile: {
@@ -29,7 +38,8 @@ const profileHandler = async (res, userInfo, profile, update = false) => {
                 avatar,
                 ...rest,
                 social,
-                cv
+                cv,
+                updatedAt
             }
         })
     })
@@ -52,6 +62,11 @@ router.get('/user-profile', auth.verifyToken, async (req, res) => {
 
                         await profileHandler(res, user, profile)
 
+                    }).catch(err=>{
+                        const message = ErrorHandler(err)
+                        return res.status(400).json({
+                            message
+                        })
                     })
                 })
 
@@ -97,6 +112,9 @@ router.put('/user-profile', auth.verifyToken, async (req, res) => {
                 }
                 delete profileInfo[items]
             })
+            if(profileInfo['date_of_birth'])
+                profileInfo['date_of_birth'] = moment(profileInfo['date_of_birth'], defaultDateFormat);
+
             profileInfo['social'] = social
             userInfo.populate({
                 path: 'avatar',
@@ -105,6 +123,11 @@ router.put('/user-profile', auth.verifyToken, async (req, res) => {
             }).then(async user => {
                 await Profiles.findOneAndUpdate({ userId: id }, { ...profileInfo }, { new: true, upsert: true }).then(async profile => {
                     await profileHandler(res, user, profile, true)
+                }).catch(err=>{
+                    const message = ErrorHandler(err)
+                    return res.status(400).json({
+                        message
+                    })
                 })
             })
             return;

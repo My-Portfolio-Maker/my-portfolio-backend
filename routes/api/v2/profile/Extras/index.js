@@ -18,6 +18,11 @@ const getExtras = async (_id, name, res, cb) => {
                     message: `Extras for ${name}`,
                     data: extras
                 });
+            }).catch(err=>{
+                const message = ErrorHandler(err)
+                return res.status(400).json({
+                    message
+                })
             })
         }
         catch (err) {
@@ -120,6 +125,11 @@ router.delete('/delete', auth.verifyToken, async (req, res) => {
                     return res.status(200).json({
                         message: `Deleted ${deleted.name} for ${name}`,
                         data: deleted
+                    })
+                }).catch(err=>{
+                    const message = ErrorHandler(err)
+                    return res.status(400).json({
+                        message
                     })
                 })
             }
