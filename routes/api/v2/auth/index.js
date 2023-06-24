@@ -49,9 +49,7 @@ router.post("/register", async (req, res) => {
         })
     }
     catch (err) {
-        console.log(err)
         const message = ErrorHandler(err)
-        console.log(message)
         return res.status(400).send(message)
 
 
@@ -95,6 +93,11 @@ router.post("/login", async (req, res) => {
                         access_token: token
                     })
                 })
+            }).catch(err=>{
+                const message = ErrorHandler(err)
+                return res.status(400).json({
+                    message
+                })
             })
             return;
         }
@@ -103,9 +106,7 @@ router.post("/login", async (req, res) => {
         })
     }
     catch (err) {
-        console.log(err)
         const message = ErrorHandler(err)
-        console.log(message)
         return res.status(400).send(message)
 
 
@@ -144,6 +145,11 @@ router.delete("/logout", auth.verifyToken, async (req, res) => {
                 })
             }
             return;
+        }).catch(err=>{
+            const message = ErrorHandler(err)
+            return res.status(400).json({
+                message
+            })
         });
     }
     catch (err) {

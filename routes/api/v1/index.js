@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const path = require('path');
-const { __basedir } = require('../../../server');
+const { __basedir } = require('../../../server.js');
 const auth = require('../../../middleware/auth');
 const contentType = require('../../../middleware/contentType');
 

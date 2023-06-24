@@ -1,10 +1,9 @@
 const express = require('express');
 const ErrorHandler = require('../../../../../errors/ErrorHandler');
 const path = require('path');
-const CV = require('../../../../../models/CV');
 const router = express.Router()
 var mime = require('mime-types');
-const { __basedir } = require('../../../../../server');
+const { __basedir } = require('../../../../../server.js');
 const Users = require('../../../../../models/Users');
 
 router.get('/:name/download', async (req, res) => {

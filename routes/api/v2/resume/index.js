@@ -7,6 +7,7 @@ const Resume = require('../../../../models/Resume');
 const moment = require('moment');
 const ResumeMaster = require('../../../../models/ResumeMaster');
 const { resolveDateFormat } = require('../../../../utils');
+const { defaultDateFormat } = require('../../../../constants');
 
 // @desc       Add Experience Details
 // @route      POST /api/resume/add
@@ -25,11 +26,11 @@ router.post('/add', auth.verifyToken, async (req, res) => {
 
             const data = {
                 userId: _id,
-                start_date: moment(start_date, 'DD/MM/YYYY'),
+                start_date: moment(start_date, defaultDateFormat),
                 ...rest
             }
             if (end_date && !rest.cwh_flag)
-                data['end_date'] = moment(end_date, 'DD/MM/YYYY');
+                data['end_date'] = moment(end_date, defaultDateFormat);
 
             await ResumeMaster.findOneAndUpdate({ userId: _id }, {}, { upsert: true, new: true }).then(async resumeMaster => {
                 if (resumeMaster) {
@@ -67,6 +68,11 @@ router.post('/add', auth.verifyToken, async (req, res) => {
                         return res.status(401).send(message);
                     }
                 }
+            }).catch(err=>{
+                const message = ErrorHandler(err)
+                return res.status(400).json({
+                    message
+                })
             })
         }
     }
@@ -97,6 +103,11 @@ router.get('/', auth.verifyToken, async (req, res) => {
                         data: resume
 
                     })
+                })
+            }).catch(err=>{
+                const message = ErrorHandler(err)
+                return res.status(400).json({
+                    message
                 })
             })
 
@@ -145,6 +156,11 @@ router.put('/update', auth.verifyToken, async (req, res) => {
                         message: `Experience details updated for ${name}`,
                         data: rest
                     })
+                }).catch(err=>{
+                    const message = ErrorHandler(err)
+                    return res.status(400).json({
+                        message
+                    })
                 })
             })
         }
@@ -175,6 +191,11 @@ router.delete('/delete', auth.verifyToken, async (req, res) => {
                     return res.status(200).json({
                         message: `Experience details for ${name} deleted successfully`,
                         data: rest
+                    })
+                }).catch(err=>{
+                    const message = ErrorHandler(err)
+                    return res.status(400).json({
+                        message
                     })
                 })
 

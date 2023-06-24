@@ -24,10 +24,14 @@ router.get('/', async (req, res) => {
                         },
                         select: { skillId: 1, score: 1 },
                     }).then(skills => {
-                        const { userId, _id, ...skillInfo } = skills.toObject()
+                        const { userId, _id, title, ...skillInfo } = skills.toObject()
                         return res.status(200).json({
                             message: `Skills of ${user.name}`,
-                            ...skillInfo,
+                            data: {
+                                userId,
+                                title,
+                                ...skillInfo,
+                            }
                         })
                     })
                 })

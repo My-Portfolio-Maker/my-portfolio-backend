@@ -30,7 +30,6 @@ const UserSchema = new mongoose.Schema({
     session: [{
         type: Schema.Types.ObjectId,
         ref: "Sessions",
-        required: true,
         default: [],
     }],
 

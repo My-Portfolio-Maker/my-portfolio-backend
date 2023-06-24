@@ -158,7 +158,7 @@ router.put("/update", auth.verifyToken, async (req, res) => {
         const user = await Users.findById(req.user.id);
         if (user) {
             await Services.findOneAndUpdate({ _id: id }, { name }, { new: true }).then(service => {
-                
+
                 // const { skillMasterId, createdAt, updatedAt, ...skillInfo } = info.toObject()
                 return res.status(200).json({
                     message: `Updated Service Name for ${user.name}`,
@@ -192,29 +192,40 @@ router.delete("/delete", auth.verifyToken, async (req, res) => {
     try {
         const user = await Users.findById(req.user?.id);
         const fn = async (string, boolean = true) => {
-            await ServicesMaster.findOneAndUpdate({ userId: user._id }, { $pull: boolean ? { services: string } : { custom_services: string } }, { new: true }).then(newService => {
-                newService.populate({
+            await ServicesMaster.findOneAndUpdate({
+                $and: [{ userId: user._id }, boolean ? {
+                    services: {
+                        "$in": [string]
+                    }
+                } : {
+                    custom_services: {
+                        "$in": [string]
+                    }
+                }]
+            }, { $pull: boolean ? { services: string } : { custom_services: string } }, { new: true }).then(async newService => {
+                await newService.populate({
                     path: 'services',
                     select: { name: 1, type: 1 },
                 }).then(info => {
                     const { _id, ...rest } = info.toObject()
                     return res.status(200).json({
-                        message: `Deleted service name for ${user.name}`,
+                        message: `Updated services for ${user.name}`,
                         data: { ...rest }
                     })
                 })
-            }).catch(_ => {
+
+            }).catch(_=>{
                 return res.status(404).json({
-                    message: 'Service name not found'
+                    message: `Service${boolean ? '' : ` name - ${string}`} not found`
                 })
             })
         }
         if (user._id) {
             if (id) {
-                fn(id)
+                await fn(id)
             }
             else if (name) {
-                fn(name, false)
+                await fn(name, false)
             }
         }
     }

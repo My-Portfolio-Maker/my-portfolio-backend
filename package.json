@@ -6,7 +6,8 @@
   "scripts": {
     "start": "cross-env NODE_ENV=production node server",
     "dev": "cross-env NODE_ENV=development nodemon server",
-    "cron-dev": "nodemon cron/index.js",
+    "dev-no-crash": "cross-env NODE_ENV=development-no-crash nodemon server",
+    "cron-dev": "cross-env nodemon cron/index.js",
     "cron": "node cron/index.js",
     "development": "concurrently \"npm run dev\" \"npm run cron-dev\"",
     "prod": "concurrently \"npm run start\" \"npm run cron\""
