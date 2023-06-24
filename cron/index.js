@@ -1,7 +1,7 @@
-const connectDB = require("./config/db");
-const SessionRemoveCron = require("./cron/SessionCron");
+const connectDB = require("../config/db");
+const SessionRemoveCron = require("./SessionCron");
 const dotenv = require('dotenv');
-const UploadsRemoveCron = require("./cron/UploadsCron.js/index.js");
+const UploadsRemoveCron = require("./UploadsCron.js/index.js");
 
 
 const initCron = async () => {
