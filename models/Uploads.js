@@ -1,6 +1,11 @@
 const { default: mongoose, Schema, mongo } = require("mongoose");
 
 const UploadsSchema = new mongoose.Schema({
+    uploaded_by: {
+        type: Schema.Types.ObjectId,
+        ref: 'Users',
+        required: true,
+    },
     name: {
         type: String,
         required: true

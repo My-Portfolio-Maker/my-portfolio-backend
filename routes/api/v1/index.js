@@ -13,7 +13,6 @@ router.use('/get/resume/', auth.verifyUID, require('./get/resume'))
 router.use('/get/services/', auth.verifyUID, require('./get/services'))
 router.use('/get/uploads', require('./get/uploads'));
 
-router.use('/uploads', contentType, express.static(path.join(__basedir, '/uploads/images')));
 
 router.get('/', async(_, res)=>{
 
