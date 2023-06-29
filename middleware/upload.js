@@ -5,6 +5,7 @@ const { getFileExtension } = require('../utils');
 const util = require('util');
 const ErrorHandler = require('../errors/ErrorHandler');
 const UploadErrorHandler = require('../errors/UploadErrorHandler');
+const fs = require('fs');
 
 const maxSize = 2 * 1024 * 1024
 
@@ -33,7 +34,7 @@ const SingleFile = (req, res, next) => {
 }
 
 const MultipleImageFiles = (req, res, next) => {
-    const upload = uploadFile("images", true).array('image', 5)
+    const upload = uploadFile("images").array('image', 5)
 
     upload(req, res, function (err) {
         nextHandler(res, err, next)
@@ -41,9 +42,27 @@ const MultipleImageFiles = (req, res, next) => {
 }
 
 const uploadFile = (type, keepExtension) => {
+    //middleware to create upload directories
+
+    const createDir = async (type) => {
+
+        const dir = `./uploads/${type}`
+
+        if (!fs.existsSync(dir)) {
+            console.log('Creating upload directories...')
+            fs.mkdirSync(dir, {
+                recursive: true
+            })
+            return true
+        }
+        else
+            return true
+    }
+
     let storage = multer.diskStorage({
         destination: (req, file, cb) => {
-            cb(null, __basedir + `/uploads/${type}`)
+            if(createDir(type))
+                cb(null, __basedir + `/uploads/${type}`)
         },
         filename: (req, file, cb) => {
             const newFileName = keepExtension ? uuidv4() + "." + getFileExtension(file.originalname) : uuidv4();

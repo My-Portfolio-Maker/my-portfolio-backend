@@ -8,6 +8,7 @@ const formidable = require('express-formidable');
 const cors = require('cors')
 const moment = require('moment');
 const path = require('path')
+const fs = require('fs');
 
 module.exports = {
     __basedir: __dirname
