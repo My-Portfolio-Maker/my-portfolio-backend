@@ -9,6 +9,7 @@ const cors = require('cors')
 const moment = require('moment');
 const path = require('path')
 const fs = require('fs');
+const connectSMTP = require('./config/smtp');
 
 module.exports = {
     __basedir: __dirname
@@ -22,6 +23,9 @@ dotenv.config({
 
 // Connect to DB
 connectDB(process.env.MONGODB_URI, false)
+
+// Connect to SMTP Server in Nodemailer
+global.transporter = connectSMTP('gmail');
 
 const app = express();
 
@@ -73,6 +77,8 @@ app.use((_req, res, next) => {
     res.setHeader('Content-Type', 'application/json')
     return next()
 });
+
+
 
 //routes
 

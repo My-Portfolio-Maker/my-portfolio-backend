@@ -7,6 +7,7 @@ const ServicesSchema = new mongoose.Schema({
         required: true,
         unique: true
     },
+   
     type: {
         type: String,
         required: true,
