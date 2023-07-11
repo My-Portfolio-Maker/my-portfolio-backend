@@ -13,6 +13,8 @@ router.use('/get/resume/', auth.verifyUID, require('./get/resume'))
 router.use('/get/services/', auth.verifyUID, require('./get/services'))
 router.use('/get/uploads', require('./get/uploads'));
 
+router.use('/email', auth.verifyUID, require('./email'));
+
 
 router.get('/', async(_, res)=>{
 

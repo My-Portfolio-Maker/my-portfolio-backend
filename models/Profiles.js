@@ -29,9 +29,17 @@ const ProfileSchema = new mongoose.Schema({
         type: String,
         default: ''
     },
+    city: {
+        type: String,
+        required: true,
+    },
     pincode: {
         type: Number,
         default: null
+    },
+    field: {
+        type: String,
+        required: true
     },
     aboutMe: {
         type: String,
