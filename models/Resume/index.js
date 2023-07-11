@@ -7,6 +7,10 @@ const ResumeSchema = new mongoose.Schema({
         required: true,
         ref: 'ResumeMaster'
     },
+    order: {
+        type: Number,
+        required: true,
+    },
     name: {
         type: String,
         default: '',
@@ -28,7 +32,7 @@ const ResumeSchema = new mongoose.Schema({
     },
     start_date: {
         type: Date,
-        default: Date.now,
+        default: null,
         required: true,
     },
     cwh_flag: {
@@ -38,10 +42,14 @@ const ResumeSchema = new mongoose.Schema({
     },
     end_date: {
         type: Date,
-        default: Date.now,
+        default: null,
         required: function(){
-            return !this.cwh_flag
+            return this.cwh_flag === false
         }
+    },
+    type: {
+        type: String,
+        required: true
     }
 },{
     versionKey: false,

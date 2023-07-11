@@ -29,9 +29,10 @@ router.post('/add', auth.verifyToken, async (req, res) => {
                 start_date: moment(start_date, defaultDateFormat),
                 ...rest
             }
-            if (end_date && !rest.cwh_flag)
+            if (end_date && rest.cwh_flag == 'false'){
                 data['end_date'] = moment(end_date, defaultDateFormat);
-
+            }
+            
             await ResumeMaster.findOneAndUpdate({ userId: _id }, {}, { upsert: true, new: true }).then(async resumeMaster => {
                 if (resumeMaster) {
                     const { _id } = resumeMaster
@@ -87,6 +88,18 @@ router.post('/add', auth.verifyToken, async (req, res) => {
 
 router.get('/', auth.verifyToken, async (req, res) => {
     const { id, name } = req.user;
+    
+    let {type} = req.query
+
+    if(!type) {
+        type = 'all'
+    }
+    const getType = ()=>{
+        if(type === 'all')
+            return ''
+        else 
+            return {type}
+    }
 
     try {
         const user = await Users.findById(id);
@@ -95,11 +108,11 @@ router.get('/', auth.verifyToken, async (req, res) => {
                 const { _id } = resumeMaster
                 resumeMaster.populate({
                     path: 'experiences',
-                    match: { resumeMasterId: _id },
+                    match: { resumeMasterId: _id, ...getType() },
                     select: { createdAt: 0, updatedAt: 0, resumeMasterId: 0, cwh_flag: 0 }
                 }).then(resume => {
                     return res.status(200).json({
-                        message: `Experience details for ${name}`,
+                        message: `${type==='experience'?'Experience':type==='all'?'All Resume':'Education'} details for ${name}`,
                         data: resume
 
                     })
@@ -142,7 +155,8 @@ router.put('/update', auth.verifyToken, async (req, res) => {
                 }
                 if (end_date && rest.cwh_flag === 'false')
                     newData['end_date'] = resolveDateFormat(end_date)
-                else newData['end_date'] = resolveDateFormat()
+                else 
+                    newData['end_date'] = null
 
                 await Resume.findOneAndUpdate({
                     $and: [{
