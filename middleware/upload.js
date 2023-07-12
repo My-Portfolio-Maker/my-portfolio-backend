@@ -7,7 +7,7 @@ const ErrorHandler = require('../errors/ErrorHandler');
 const UploadErrorHandler = require('../errors/UploadErrorHandler');
 const fs = require('fs');
 
-const maxSize = 2 * 1024 * 1024
+const maxSize = 8 * 1024 * 1024
 
 const nextHandler = (res, err, next) => {
     let message;
