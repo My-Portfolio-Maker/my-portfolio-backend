@@ -11,6 +11,8 @@ const path = require('path')
 const fs = require('fs');
 const connectSMTP = require('./config/smtp');
 
+const AWSConfig = require('./config/aws_idrive');
+
 module.exports = {
     __basedir: __dirname
 }
@@ -26,6 +28,9 @@ connectDB(process.env.MONGODB_URI, false)
 
 // Connect to SMTP Server in Nodemailer
 global.transporter = connectSMTP('gmail');
+
+// Setup AWS S3 bucket in idrive e2
+global.s3 = AWSConfig();
 
 const app = express();
 
