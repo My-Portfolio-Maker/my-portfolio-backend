@@ -133,6 +133,7 @@ const s3UploadFile = (type, keepExtension) => {
             cb(null, fullPath);
         },
         contentType: multerS3.AUTO_CONTENT_TYPE,
+        
     });
 
     // function to sanitize files and send error for unsupported files
@@ -181,7 +182,9 @@ const s3UploadFile = (type, keepExtension) => {
         },
         limits: {
             fileSize: maxSize // 8mb file size
-        }
+        },
+        
+
     })
 }
 
