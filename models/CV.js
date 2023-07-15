@@ -17,6 +17,10 @@ const CvSchema = new mongoose.Schema({
     type: {
         type: String,
         required: true
+    },
+    size: {
+        type: Number,
+        required: true
     }
 }, {
     versionKey: false,
