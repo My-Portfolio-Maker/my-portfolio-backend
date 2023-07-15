@@ -8,16 +8,11 @@ const { GetObjectCommand } = require('@aws-sdk/client-s3');
 router.get('/:name/download', async (req, res) => {
 
     const { name: fileName } = req.params
-    const { uid, type } = req.query
+    const { uid } = req.query
 
     try {
         const user = await Users.findById(uid)
         if (user) {
-            const { name } = user.toObject()
-            const fileExtension = mime.extension(type);
-            const ar = name.split(' ').join('_');
-
-            const displayFileName = `${ar}_Resume${fileExtension ? `.${fileExtension}` : ''}`
 
             const s3 = await global.s3;
 
@@ -27,7 +22,15 @@ router.get('/:name/download', async (req, res) => {
             })
 
             try {
+                const { name } = user.toObject()
+
+                const ar = name.split(' ').join('_');
                 const response = await s3.send(command)
+                const fileExtension = mime.extension(response.ContentType);
+                const displayFileName = `${ar}_Resume${fileExtension ? `.${fileExtension}` : ''}`
+
+                if (!response) return res.status(404).set('Content-Type', 'text/plain').send(`File not found`);
+
                 res.attachment(displayFileName);
                 response.Body.pipe(res);
             }
@@ -37,7 +40,7 @@ router.get('/:name/download', async (req, res) => {
                     message
                 })
             }
-            
+
         }
     }
     catch (err) {
@@ -52,7 +55,7 @@ router.get('/:name/download', async (req, res) => {
 
 router.get('/:name/view', async (req, res) => {
     const { name: fileName } = req.params;
-    const { uid, type } = req.query
+    const { uid } = req.query
 
     try {
         const user = await Users.findById(uid)
@@ -67,15 +70,11 @@ router.get('/:name/view', async (req, res) => {
 
             try {
                 const response = await s3.send(command)
-
-                const data = await response.Body.transformToString('base64')
-                if (!data) return res.status(404).set('Content-Type', 'text/plain').send(`File not found`);
-                var img = Buffer.from(data, 'base64');
+                if (!response) return res.status(404).set('Content-Type', 'text/plain').send(`File not found`);
                 res.writeHead(200, {
-                    'Content-Type': type,
-                    'Content-Length': img.length
+                    'Content-Type': response.ContentType,
                 })
-                res.end(img, 'base64')
+                response.Body.pipe(res);
             }
             catch (err) {
                 const message = ErrorHandler(err);
