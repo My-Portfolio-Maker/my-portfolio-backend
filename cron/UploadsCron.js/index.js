@@ -66,7 +66,7 @@ const deleteObject = async (s3, bucket, key) => {
 // @param       {Object}  cronJob  Cron job object
 // @interval    Every midnight
 
-let UploadsRemoveCron = cron.schedule('*/5 * * * *', async () => {
+let UploadsRemoveCron = cron.schedule('0 0 0 * * *', async () => {
     console.log("Current time: ", new Date().toLocaleTimeString());
     console.log("This Cron Job runs only on midnights\n");
     console.log("Finding Unrelated CVs and Images...");
@@ -117,7 +117,7 @@ let UploadsRemoveCron = cron.schedule('*/5 * * * *', async () => {
                         const imageinUser = await Users.find({ avatar: _id }).count();
                         const imageinProfile = await Profiles.find({ images: _id }).count()
 
-                        if (!imageinUser || !imageinProfile) {
+                        if (!imageinUser && !imageinProfile) {
                             console.log('Deleting unrelated image documents from collection...');
                             await Uploads.deleteOne({ name: file }).then(deleted => {
                                 if (deleted.acknowledged)

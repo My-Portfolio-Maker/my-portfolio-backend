@@ -7,7 +7,7 @@ const { __basedir } = require('../../../../../server.js');
 const Users = require('../../../../../models/Users');
 const fs = require('fs')
 
-router.use('/s3', require('./s3'));
+router.use('/s3', require('./s3bucket'));
 
 
 router.get('/:name/download', async (req, res) => {
