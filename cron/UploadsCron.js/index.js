@@ -7,24 +7,78 @@ const path = require('path');
 const fs = require('fs');
 const { __basedir } = require('../../server.js');
 const Profiles = require('../../models/Profiles');
+const { ListObjectsV2Command, DeleteObjectCommand, HeadObjectCommand } = require('@aws-sdk/client-s3');
 
+
+const getContents = async (s3, bucket, type) => {
+    const command = new ListObjectsV2Command({
+        Bucket: bucket,
+        Prefix: type,
+    });
+
+    let contents = [];
+
+    try {
+        let isTruncated = true;
+
+
+        while (isTruncated) {
+            const { Contents, IsTruncated, NextContinuationToken } = await s3.send(command);
+            const contentsList = Contents.map((c) => `${c.Key.split('/')[1]}`);
+            contents.push(...contentsList);
+            isTruncated = IsTruncated;
+            command.input.ContinuationToken = NextContinuationToken;
+        }
+
+        return contents;
+
+    } catch (err) {
+        // no error
+    }
+}
+const checkObjectExists = async (s3, bucket, key) => {
+    const command = new HeadObjectCommand({
+        Bucket: bucket,
+        Key: key,
+    });
+
+    try {
+        const rp = await s3.send(command)
+        return rp
+
+    } catch (err) {
+        // no error
+    }
+}
+const deleteObject = async (s3, bucket, key) => {
+    const command = new DeleteObjectCommand({
+        Bucket: bucket,
+        Key: key,
+    });
+
+    try {
+        await s3.send(command);
+    } catch (err) {
+        console.error(err);
+    }
+}
 // @desc        Cron job to remove unrelated cv uploads and images
 // @param       {Object}  cronJob  Cron job object
 // @interval    Every midnight
 
-let UploadsRemoveCron = cron.schedule('0 0 0 * * *', async () => {
+let UploadsRemoveCron = cron.schedule('*/5 * * * *', async () => {
     console.log("Current time: ", new Date().toLocaleTimeString());
     console.log("This Cron Job runs only on midnights\n");
     console.log("Finding Unrelated CVs and Images...");
     try {
-        const baseDir = path.join(__basedir, "uploads");
+        // const baseDir = path.join(__basedir, "uploads");
 
-        // Checking collection - uploads for images
-        const imagePath = path.join(baseDir, "/images");
-        const fn = (file) => {
+        // // Checking collection - uploads for images
+        // const imagePath = path.join(baseDir, "/images");
+        const fn = (file, type) => {
             console.log('Deleting Unrelated Image...')
-            const filePath = path.join(imagePath, file);
-            fs.unlinkSync(filePath);
+            const key = `${type}/${file}`
+            deleteObject(global.s3, process.env.AWS_BUCKET_NAME, key)
         }
         const userList = await Users.find();
         userList.forEach(async ({ _id, avatar }) => {
@@ -48,11 +102,15 @@ let UploadsRemoveCron = cron.schedule('0 0 0 * * *', async () => {
                 })
             }
         })
-        fs.readdir(imagePath, (err, files) => {
-            files.forEach(async file => {
+
+        const objectList = await getContents(global.s3, process.env.AWS_BUCKET_NAME, "images");
+
+        if (objectList?.length) {
+            objectList.forEach(async file => {
+
                 await Uploads.find({ name: file }).then(async upload => {
                     if (!upload.length) {
-                        fn(file)
+                        fn(file, "images")
                     }
                     else {
                         const { _id } = upload[0];
@@ -63,28 +121,25 @@ let UploadsRemoveCron = cron.schedule('0 0 0 * * *', async () => {
                             console.log('Deleting unrelated image documents from collection...');
                             await Uploads.deleteOne({ name: file }).then(deleted => {
                                 if (deleted.acknowledged)
-                                    fn(file)
+                                    fn(file, "images")
                             })
                         }
                     }
                 })
             })
-            if(err){
-                throw err;
+        }
+
+
+        const uploadList = await Uploads.find()
+        uploadList.forEach(async ({ name }) => {
+
+            const key = `images/${name}`
+            const check = await checkObjectExists(global.s3, process.env.AWS_BUCKET_NAME, key)
+            if (!check) {
+                console.log('Deleting unrelated image documents from collection...');
+                await Uploads.deleteOne({ name })
             }
         })
-        const uploadList = await Uploads.find()
-        uploadList.forEach(async ({name})=>{
-            const filePath = path.join(imagePath, name);
-            fs.stat(filePath, async (err, stats)=>{
-                if(!stats || err){
-                    console.log('Deleting unrelated image documents from collection...');
-                    await Uploads.deleteOne({name})
-                }
-            })
-        })
-
-
     }
     catch (err) {
         console.log(err);
