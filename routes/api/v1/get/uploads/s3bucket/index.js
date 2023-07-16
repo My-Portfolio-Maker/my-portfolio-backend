@@ -53,7 +53,7 @@ router.get('/:name/download', async (req, res) => {
 
 })
 
-router.get('/:name/view', async (req, res) => {
+router.get('/:name', async (req, res) => {
     const { name: fileName } = req.params;
     const { uid } = req.query
 
