@@ -13,6 +13,8 @@ router.use('/get/extras/', auth.verifyUID, require('./get/extras'))
 router.use('/get/resume/', auth.verifyUID, require('./get/resume'))
 router.use('/get/services/', auth.verifyUID, require('./get/services'))
 router.use('/get/uploads', require('./get/uploads'));
+router.use('/get/projects', auth.verifyUID, require('./get/projects'))
+
 
 router.use('/email', [auth.verifyUID, formData], require('./email'));
 

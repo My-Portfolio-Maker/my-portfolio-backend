@@ -24,7 +24,7 @@ router.post('/send', async (req, res) => {
 
                 const mailStatus = await mailRequest.sendMail(mailOptions)
                 if (mailStatus) {
-                    const {messageId} = mailStatus
+                    const { messageId } = mailStatus
                     return res.status(200).json({
                         message: 'Submitted request. Please check your mail',
                         message_id: messageId

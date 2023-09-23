@@ -8,6 +8,7 @@ const { getAuthTokenFromHeader } = require('../../../../utils');
 const SocialConstants = require('../../../../constants/Socials');
 const moment = require('moment');
 const { defaultDateFormat } = require('../../../../constants');
+const { verifyUploadsHandler } = require('../../utilities');
 
 
 router.use('/extras', auth.verifyToken, require('./Extras'));
@@ -62,7 +63,7 @@ router.get('/user-profile', auth.verifyToken, async (req, res) => {
 
                         await profileHandler(res, user, profile)
 
-                    }).catch(err=>{
+                    }).catch(err => {
                         const message = ErrorHandler(err)
                         return res.status(400).json({
                             message
@@ -112,8 +113,12 @@ router.put('/user-profile', auth.verifyToken, async (req, res) => {
                 }
                 delete profileInfo[items]
             })
-            if(profileInfo['date_of_birth'])
+            if (profileInfo['date_of_birth'])
                 profileInfo['date_of_birth'] = moment(profileInfo['date_of_birth'], defaultDateFormat);
+
+            if (profileInfo?.images?.length) {
+                profileInfo.images = [...await verifyUploadsHandler(profileInfo.images, user._id)]
+            }
 
             profileInfo['social'] = social
             userInfo.populate({
@@ -123,7 +128,7 @@ router.put('/user-profile', auth.verifyToken, async (req, res) => {
             }).then(async user => {
                 await Profiles.findOneAndUpdate({ userId: id }, { ...profileInfo }, { new: true, upsert: true }).then(async profile => {
                     await profileHandler(res, user, profile, true)
-                }).catch(err=>{
+                }).catch(err => {
                     const message = ErrorHandler(err)
                     return res.status(400).json({
                         message
