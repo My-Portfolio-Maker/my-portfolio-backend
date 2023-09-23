@@ -10,6 +10,8 @@ router.use("/profile", auth.verifyToken, require('./profile').router);
 router.use("/skills", auth.verifyToken, require('./skills'));
 router.use("/resume", auth.verifyToken, require('./resume'));
 router.use('/services', auth.verifyToken, require('./services'));
+router.use('/projects', auth.verifyToken, require('./projects'));
+
 
 // @desc    Server API Page
 // @route   GET /api/v2

@@ -24,6 +24,10 @@ router.get('/', auth.verifyToken, async (req, res) => {
                         message: `Service Names for ${user.name}`,
                         data: rest
                     })
+                }).catch(_=>{
+                    return res.status(200).json({
+                        message: `No services for ${user.name}`,
+                    })
                 })
             })
         }
