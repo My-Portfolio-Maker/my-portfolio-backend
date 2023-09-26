@@ -8,6 +8,7 @@ const fs = require('fs');
 const { __basedir } = require('../../server.js');
 const Profiles = require('../../models/Profiles');
 const { ListObjectsV2Command, DeleteObjectCommand, HeadObjectCommand } = require('@aws-sdk/client-s3');
+const Projects = require('../../models/Projects');
 
 
 const getContents = async (s3, bucket, type) => {
@@ -116,8 +117,9 @@ let UploadsRemoveCron = cron.schedule('0 0 0 * * *', async () => {
                         const { _id } = upload[0];
                         const imageinUser = await Users.find({ avatar: _id }).count();
                         const imageinProfile = await Profiles.find({ images: _id }).count()
+                        const imageinProjects = await Projects.find({images: _id}).count()
 
-                        if (!imageinUser && !imageinProfile) {
+                        if (!imageinUser && !imageinProfile && !imageinProjects) {
                             console.log('Deleting unrelated image documents from collection...');
                             await Uploads.deleteOne({ name: file }).then(deleted => {
                                 if (deleted.acknowledged)
