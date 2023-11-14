@@ -43,9 +43,7 @@
     "passport": "^0.6.0",
     "passport-oauth2": "^1.6.1",
     "uuid": "^9.0.0",
-    "validator": "^13.7.0"
-  },
-  "devDependencies": {
+    "validator": "^13.7.0",
     "cross-env": "^7.0.3"
   }
 }
